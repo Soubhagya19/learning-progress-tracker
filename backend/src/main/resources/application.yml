@@ -1,0 +1,27 @@
+server:
+  port: ${PORT:8080}
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        name: LPT_SESSION
+        http-only: true
+        same-site: ${COOKIE_SAME_SITE:lax}
+        secure: ${COOKIE_SECURE:false}
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/learning_tracker}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+app:
+  cors:
+    allowed-origins: ${FRONTEND_URL:http://localhost:3000}
+  coordinator:
+    email: ${COORDINATOR_EMAIL:coordinator@pdi-cohort.example}
+    password: ${COORDINATOR_PASSWORD:CoordPass123!}
