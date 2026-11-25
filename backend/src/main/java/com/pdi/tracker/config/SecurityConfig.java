@@ -62,7 +62,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf
                 .csrfTokenRepository(csrfRepo)
                 .csrfTokenRequestHandler(requestHandler)
-                .ignoringRequestMatchers("/api/v1/auth/login")
+                .ignoringRequestMatchers("/api/v1/auth/login", "/api/v1/ai/**")
             )
             .securityContext(sc -> sc.securityContextRepository(securityContextRepository))
             .sessionManagement(sm -> sm
@@ -73,6 +73,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                 .requestMatchers("/api/v1/auth/change-password", "/api/v1/auth/logout", "/api/v1/auth/me").authenticated()
                 .requestMatchers("/api/v1/me/**").hasRole("CANDIDATE")
+                .requestMatchers("/api/v1/ai/**").hasAnyRole("CANDIDATE", "COORDINATOR")
                 .requestMatchers(HttpMethod.PATCH, "/api/v1/assignments/*/status").hasAnyRole("CANDIDATE", "COORDINATOR")
                 .requestMatchers("/api/v1/activities/**", "/api/v1/learners/**", "/api/v1/assignments/**", "/api/v1/cohort-summary").hasRole("COORDINATOR")
                 .anyRequest().authenticated()
