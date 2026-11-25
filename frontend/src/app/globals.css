@@ -3,21 +3,36 @@
 @tailwind utilities;
 
 :root {
-    --bg-canvas: #070812;
-    --bg-card: rgba(15, 18, 36, 0.72);
-    --bg-card-hover: rgba(21, 26, 52, 0.86);
-    --border-subtle: rgba(129, 140, 248, 0.16);
-    --border-glow: rgba(99, 102, 241, 0.42);
+    --bg-canvas: #111831;
+    --bg-card: rgba(27, 37, 68, 0.62);
+    --bg-card-hover: rgba(35, 48, 86, 0.76);
+    --border-subtle: rgba(165, 180, 252, 0.16);
+    --border-glow: rgba(129, 140, 248, 0.38);
+}
+
+@keyframes auroraShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 body {
     background-color: var(--bg-canvas);
     background-image:
-        radial-gradient(circle at 14% 12%, rgba(79, 70, 229, 0.18), transparent 38%),
-        radial-gradient(circle at 86% 18%, rgba(16, 185, 129, 0.14), transparent 36%),
-        radial-gradient(circle at 52% 88%, rgba(139, 92, 246, 0.15), transparent 44%);
+        radial-gradient(circle at 14% 14%, rgba(99, 102, 241, 0.16), transparent 46%),
+        radial-gradient(circle at 86% 18%, rgba(45, 212, 191, 0.13), transparent 44%),
+        radial-gradient(circle at 50% 88%, rgba(167, 139, 250, 0.14), transparent 52%),
+        linear-gradient(135deg, #0f162e 0%, #162142 35%, #12233d 70%, #111936 100%);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 220% 220%;
+    animation: auroraShift 20s ease-in-out infinite;
     background-attachment: fixed;
-    color: #f1f5f9;
+    color: #eef2ff;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     overflow-x: hidden;
 }
@@ -35,16 +50,15 @@ body {
 }
 
 @keyframes ambientPulse {
-
     0%,
     100% {
         opacity: 0.45;
-        transform: scale(1);
+        transform: translate3d(0, 0, 0) scale(1);
     }
 
     50% {
         opacity: 0.85;
-        transform: scale(1.06);
+        transform: translate3d(14px, -12px, 0) scale(1.08);
     }
 }
 
@@ -60,21 +74,21 @@ body {
 
 .bento-card {
     background: var(--bg-card);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
     border: 1px solid var(--border-subtle);
-    border-radius: 1.25rem;
-    box-shadow: 0 20px 45px -20px rgba(2, 6, 23, 0.85), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
-    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-        border-color 0.25s ease,
-        background-color 0.25s ease,
-        box-shadow 0.25s ease;
+    border-radius: 1.35rem;
+    box-shadow: 0 18px 42px -18px rgba(8, 13, 30, 0.55), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.28s ease,
+        background-color 0.28s ease,
+        box-shadow 0.28s ease;
 }
 
 .bento-card:hover {
     background: var(--bg-card-hover);
     border-color: var(--border-glow);
-    box-shadow: 0 24px 55px -18px rgba(79, 70, 229, 0.28), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 22px 48px -18px rgba(99, 102, 241, 0.24), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
 }
 
 .animate-bento {
@@ -102,40 +116,40 @@ body {
 }
 
 .bento-input {
-    background: rgba(9, 11, 24, 0.85);
-    border: 1px solid rgba(129, 140, 248, 0.22);
+    background: rgba(16, 23, 46, 0.75);
+    border: 1px solid rgba(165, 180, 252, 0.22);
     border-radius: 0.75rem;
     color: #f8fafc;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .bento-input::placeholder {
-    color: #64748b;
+    color: #8796b3;
 }
 
 .bento-input:focus {
     outline: none;
     border-color: #818cf8;
-    background: rgba(12, 15, 32, 0.95);
+    background: rgba(21, 30, 58, 0.92);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.22);
 }
 
 .bento-btn-primary {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #10b981 100%);
-    background-size: 180% 180%;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #0d9488 100%);
+    background-size: 200% 200%;
     border-radius: 0.75rem;
     color: #ffffff;
     font-weight: 600;
-    box-shadow: 0 10px 25px -8px rgba(99, 102, 241, 0.6);
+    box-shadow: 0 10px 25px -8px rgba(99, 102, 241, 0.5);
     transition: transform 0.2s ease, box-shadow 0.2s ease, background-position 0.4s ease;
 }
 
 .bento-btn-primary:hover {
     transform: translateY(-1px);
     background-position: 100% 50%;
-    box-shadow: 0 14px 30px -6px rgba(124, 58, 237, 0.65);
+    box-shadow: 0 14px 30px -6px rgba(13, 148, 136, 0.5);
 }
 
 .bento-btn-primary:active {

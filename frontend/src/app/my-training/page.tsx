@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { Assignment } from '@/types';
+import LearningBlogFeed from '@/components/LearningBlogFeed';
 
 const STATUSES = ['Not Started', 'In Progress', 'Completed'] as const;
 type FilterTab = 'All' | (typeof STATUSES)[number];
@@ -96,7 +97,7 @@ export default function MyTrainingPage() {
       />
 
       {/* Sticky Glass Header */}
-      <header className="sticky top-0 z-30 border-b border-indigo-500/15 bg-[#070812]/80 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 border-b border-indigo-500/15 bg-[#111831]/75 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-emerald-400 shadow-md shadow-indigo-500/25">
@@ -285,7 +286,7 @@ export default function MyTrainingPage() {
                   onClick={() => setFilter(tab)}
                   className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition-all duration-200 ${active
                     ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/30'
-                    : 'border border-indigo-500/20 bg-[#0f1224]/70 text-slate-300 hover:border-indigo-400/40 hover:text-white'
+                    : 'border border-indigo-500/20 bg-slate-900/45 text-slate-300 hover:border-indigo-400/40 hover:text-white'
                     }`}
                 >
                   <span>{tab}</span>
@@ -399,7 +400,7 @@ export default function MyTrainingPage() {
                     <span className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                       {isUpdating ? 'Syncing progress...' : 'Update Milestone Status'}
                     </span>
-                    <div className="grid grid-cols-3 gap-2 rounded-xl border border-indigo-500/15 bg-[#090b18]/80 p-1.5">
+                    <div className="grid grid-cols-3 gap-2 rounded-xl border border-indigo-500/15 bg-slate-900/50 p-1.5">
                       {STATUSES.map((statusOption) => {
                         const selected = asg.status === statusOption;
                         let activeClass = 'bg-slate-700 text-white shadow';
@@ -433,6 +434,7 @@ export default function MyTrainingPage() {
             })}
           </div>
         )}
+              <LearningBlogFeed canPublish={false} />
       </main>
     </div>
   );

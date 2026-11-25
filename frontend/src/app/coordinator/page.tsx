@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { Activity, Assignment, CohortSummary, CreatedCredentials, Learner } from '@/types';
+import LearningBlogFeed from '@/components/LearningBlogFeed';
 
 export default function CoordinatorDashboard() {
   const router = useRouter();
@@ -209,9 +210,9 @@ export default function CoordinatorDashboard() {
   const selectedLearner = learners.find((l) => l.id === selectedLearnerId) ?? null;
 
   return (
-    <div className="min-h-screen pb-16">
+    <div className="relative min-h-screen overflow-hidden pb-16"><div className="pointer-events-none absolute -top-24 left-1/4 h-96 w-96 rounded-full bg-indigo-400/15 blur-3xl" style={{ animation: "ambientPulse 9s ease-in-out infinite" }} /><div className="pointer-events-none absolute right-1/4 top-1/3 h-80 w-80 rounded-full bg-teal-400/15 blur-3xl" style={{ animation: "ambientPulse 11s ease-in-out infinite 2s" }} />
       {/* Top Glass Header */}
-      <header className="sticky top-0 z-30 border-b border-indigo-500/15 bg-[#070812]/80 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 border-b border-indigo-500/15 bg-[#111831]/75 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-emerald-400 shadow-md shadow-indigo-500/25">
@@ -385,7 +386,7 @@ export default function CoordinatorDashboard() {
             <p className="mb-3 text-xs text-amber-200/80">
               Shown once only. Valid for 24 hours ({issuedCreds.expiresAt}). Student will set a permanent password on first login.
             </p>
-            <div className="grid grid-cols-1 gap-3 rounded-xl border border-white/10 bg-[#070812]/80 p-4 font-mono text-xs sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 rounded-xl border border-white/10 bg-[#111831]/75 p-4 font-mono text-xs sm:grid-cols-2">
               <div className="text-slate-300">
                 <span className="text-slate-500">Email: </span>
                 <span className="text-emerald-300">{issuedCreds.email}</span>
@@ -414,7 +415,7 @@ export default function CoordinatorDashboard() {
 
             <form
               onSubmit={handleSaveActivity}
-              className="mb-6 grid grid-cols-1 gap-3 rounded-2xl border border-indigo-500/15 bg-[#090b18]/60 p-4 sm:grid-cols-4"
+              className="mb-6 grid grid-cols-1 gap-3 rounded-2xl border border-indigo-500/15 bg-slate-900/40 p-4 sm:grid-cols-4"
             >
               <input
                 type="text"
@@ -469,14 +470,14 @@ export default function CoordinatorDashboard() {
                 {activities.map((act) => (
                   <li
                     key={act.id}
-                    className="group flex items-center justify-between gap-3 rounded-xl border border-indigo-500/15 bg-[#0b0e20]/80 px-4 py-3 transition hover:border-indigo-400/40 hover:bg-[#111633]"
+                    className="group flex items-center justify-between gap-3 rounded-xl border border-indigo-500/15 bg-slate-900/45 px-4 py-3 transition hover:border-indigo-400/40 hover:bg-slate-800/60"
                   >
                     <div>
                       <div className="text-sm font-semibold text-white group-hover:text-indigo-200 transition">
                         {act.title}
                       </div>
                       <div className="text-xs text-slate-400">
-                        {act.topic} · <span className="text-emerald-400">{act.plannedHours} hrs</span>
+                        {act.topic} Â· <span className="text-emerald-400">{act.plannedHours} hrs</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -586,7 +587,7 @@ export default function CoordinatorDashboard() {
                       >
                         {learners.map((l) => (
                           <option key={l.id} value={l.id} className="bg-[#0b0e20] text-white">
-                            {l.displayName} ({l.cohort} · {l.email})
+                            {l.displayName} ({l.cohort} Â· {l.email})
                           </option>
                         ))}
                       </select>
@@ -632,7 +633,7 @@ export default function CoordinatorDashboard() {
                             return (
                               <li
                                 key={asg.id}
-                                className="flex items-center justify-between rounded-xl border border-indigo-500/15 bg-[#0b0e20]/80 px-4 py-3 text-sm transition hover:border-indigo-400/35"
+                                className="flex items-center justify-between rounded-xl border border-indigo-500/15 bg-slate-900/45 px-4 py-3 text-sm transition hover:border-indigo-400/35"
                               >
                                 <div>
                                   <span className="font-semibold text-white">{asg.activityTitle}</span>
@@ -668,6 +669,7 @@ export default function CoordinatorDashboard() {
             </section>
           </div>
         </div>
+              <LearningBlogFeed canPublish={true} />
       </main>
     </div>
   );
