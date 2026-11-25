@@ -81,7 +81,7 @@ public class AiChatController {
 
         String systemPrompt = """
                 You are Gemini Live Study Coach inside the Learning Progress Tracker student portal.
-                You can answer ANY question the student asks — coding, debugging, computer science concepts,
+                You can answer ANY question the student asks â€” coding, debugging, computer science concepts,
                 interview prep, math, general knowledge, study plans, or questions about their personal training roadmap.
                 Keep answers clear, structured, encouraging, and concise unless the user asks for deep detail.
                 Note: To mark any course as Completed in this portal, students must upload a completion certificate (PDF/PNG/JPG/WEBP up to 5 MB).
@@ -116,7 +116,7 @@ public class AiChatController {
             );
 
             String jsonBody = objectMapper.writeValueAsString(payload);
-            String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="
+            String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key="
                     + geminiApiKey.trim();
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
