@@ -1,11 +1,13 @@
 export type Role = 'COORDINATOR' | 'CANDIDATE';
 
-export interface AuthUser {
+export interface UserSession {
   accountId: number;
   email: string;
   role: Role;
   mustChangePassword: boolean;
 }
+
+export type AuthUser = UserSession;
 
 export interface Activity {
   id: number;
