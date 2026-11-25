@@ -20,6 +20,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -64,24 +65,29 @@ public class AiChatController {
             );
         }
 
+        String key = geminiApiKey.trim();
         String roadmapContext = "No assigned courses yet.";
-        if (details != null && details.getAccount().getRole() == Role.CANDIDATE) {
-            List<AssignmentResponse> list = assignmentService.getMyAssignments(details.getAccount());
-            if (!list.isEmpty()) {
-                roadmapContext = list.stream()
-                        .map(a -> String.format("- %s (Topic: %s, Planned: %d hrs, Status: %s, Cert: %s)",
-                                a.activityTitle(),
-                                a.activityTopic(),
-                                a.plannedHours(),
-                                a.status(),
-                                a.certificateName() != null ? a.certificateName() : "None"))
-                        .collect(Collectors.joining("\n"));
+        try {
+            if (details != null && details.getAccount() != null && details.getAccount().getRole() == Role.CANDIDATE) {
+                List<AssignmentResponse> list = assignmentService.getMyAssignments(details.getAccount());
+                if (list != null && !list.isEmpty()) {
+                    roadmapContext = list.stream()
+                            .map(a -> String.format("- %s (Topic: %s, Planned: %d hrs, Status: %s, Cert: %s)",
+                                    a.activityTitle(),
+                                    a.activityTopic(),
+                                    a.plannedHours(),
+                                    a.status(),
+                                    a.certificateName() != null ? a.certificateName() : "None"))
+                            .collect(Collectors.joining("\n"));
+                }
             }
+        } catch (Exception ignored) {
+            roadmapContext = "Roadmap context temporarily unavailable.";
         }
 
         String systemPrompt = """
                 You are Gemini Live Study Coach inside the Learning Progress Tracker student portal.
-                You can answer ANY question the student asks â€” coding, debugging, computer science concepts,
+                You can answer ANY question the student asks — coding, debugging, computer science concepts,
                 interview prep, math, general knowledge, study plans, or questions about their personal training roadmap.
                 Keep answers clear, structured, encouraging, and concise unless the user asks for deep detail.
                 Note: To mark any course as Completed in this portal, students must upload a completion certificate (PDF/PNG/JPG/WEBP up to 5 MB).
@@ -96,7 +102,7 @@ public class AiChatController {
                 int start = Math.max(0, req.history().size() - 8);
                 for (int i = start; i < req.history().size(); i++) {
                     ChatHistoryItem item = req.history().get(i);
-                    if (item.text() == null || item.text().isBlank()) continue;
+                    if (item == null || item.text() == null || item.text().isBlank()) continue;
                     String role = "user".equalsIgnoreCase(item.sender()) ? "user" : "model";
                     contents.add(Map.of(
                             "role", role,
@@ -116,38 +122,69 @@ public class AiChatController {
             );
 
             String jsonBody = objectMapper.writeValueAsString(payload);
-            String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key="
-                    + geminiApiKey.trim();
 
-            HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .timeout(Duration.ofSeconds(30))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                    .build();
+            var candidateModels = new LinkedHashSet<String>();
+            candidateModels.add("models/gemini-3.8-flash");
+            candidateModels.add("models/gemini-flash-latest");
+            candidateModels.add("models/gemini-2.0-flash");
 
-            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            // Also auto-discover active generateContent flash models enabled on this API key
+            try {
+                HttpRequest listReq = HttpRequest.newBuilder()
+                        .uri(URI.create("https://generativelanguage.googleapis.com/v1beta/models?key=" + key))
+                        .timeout(Duration.ofSeconds(10))
+                        .GET()
+                        .build();
+                HttpResponse<String> listRes = httpClient.send(listReq, HttpResponse.BodyHandlers.ofString());
+                if (listRes.statusCode() == 200) {
+                    JsonNode modelsArr = objectMapper.readTree(listRes.body()).path("models");
+                    if (modelsArr.isArray()) {
+                        for (JsonNode m : modelsArr) {
+                            String name = m.path("name").asText("");
+                            String methods = m.path("supportedGenerationMethods").toString();
+                            if (name.contains("flash") && methods.contains("generateContent")) {
+                                candidateModels.add(name);
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ignored) {}
 
-            if (response.statusCode() >= 400) {
-                JsonNode errRoot = objectMapper.readTree(response.body());
-                String apiMsg = errRoot.path("error").path("message").asText("Gemini API request failed.");
-                throw new ApiException(HttpStatus.BAD_GATEWAY, "Gemini error: " + apiMsg);
+            String lastError = "No compatible Gemini model responded.";
+            for (String modelName : candidateModels) {
+                String url = "https://generativelanguage.googleapis.com/v1beta/" + modelName + ":generateContent?key=" + key;
+                HttpRequest httpRequest = HttpRequest.newBuilder()
+                        .uri(URI.create(url))
+                        .timeout(Duration.ofSeconds(30))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                        .build();
+
+                HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                    JsonNode root = objectMapper.readTree(response.body());
+                    String reply = root.path("candidates")
+                            .path(0)
+                            .path("content")
+                            .path("parts")
+                            .path(0)
+                            .path("text")
+                            .asText("");
+                    if (!reply.isBlank()) {
+                        return new AiChatResponse(reply.trim());
+                    }
+                } else {
+                    JsonNode errRoot = objectMapper.readTree(response.body());
+                    lastError = modelName + " -> " + errRoot.path("error").path("message").asText("HTTP " + response.statusCode());
+                }
             }
 
-            JsonNode root = objectMapper.readTree(response.body());
-            String reply = root.path("candidates")
-                    .path(0)
-                    .path("content")
-                    .path("parts")
-                    .path(0)
-                    .path("text")
-                    .asText("I couldn't generate a response right now. Please try again.");
-
-            return new AiChatResponse(reply.trim());
+            throw new ApiException(HttpStatus.BAD_GATEWAY, "Gemini error: " + lastError);
         } catch (ApiException e) {
             throw e;
         } catch (Exception e) {
-            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to reach Gemini AI: " + e.getMessage());
+            String msg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+            throw new ApiException(HttpStatus.BAD_GATEWAY, "Gemini bridge error: " + msg);
         }
     }
 }
