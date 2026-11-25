@@ -90,7 +90,7 @@ public class AiChatController {
                 """ + roadmapContext;
 
         try {
-            List> contents = new ArrayList<>();
+            var contents = new ArrayList<>();
 
             if (req.history() != null) {
                 int start = Math.max(0, req.history().size() - 8);
@@ -110,7 +110,7 @@ public class AiChatController {
                     "parts", List.of(Map.of("text", req.message()))
             ));
 
-            Map<String, Object> payload = Map.of(
+            var payload = Map.of(
                     "system_instruction", Map.of("parts", List.of(Map.of("text", systemPrompt))),
                     "contents", contents
             );
