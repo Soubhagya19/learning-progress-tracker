@@ -75,6 +75,25 @@ public class AssignmentService {
         }
 
         AssignmentStatus newStatus = AssignmentStatus.fromValue(req.status());
+
+        if (req.certificateName() != null && !req.certificateName().isBlank()
+                && req.certificateData() != null && !req.certificateData().isBlank()) {
+            if (req.certificateData().length() > 7_500_000) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Certificate file exceeds the 5 MB limit.");
+            }
+            assignment.setCertificateName(req.certificateName().trim());
+            assignment.setCertificateData(req.certificateData());
+        }
+
+        if (newStatus == AssignmentStatus.COMPLETED && caller.getRole() == Role.CANDIDATE) {
+            if (assignment.getCertificateData() == null || assignment.getCertificateData().isBlank()) {
+                throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Please upload your completion certificate before marking this course as Completed."
+                );
+            }
+        }
+
         assignment.setStatus(newStatus);
         return toResponse(assignmentRepository.save(assignment));
     }
@@ -94,7 +113,9 @@ public class AssignmentService {
                 a.getActivity().getTitle(),
                 a.getActivity().getTopic(),
                 a.getActivity().getPlannedHours(),
-                a.getStatus().getLabel()
+                a.getStatus().getLabel(),
+                a.getCertificateName(),
+                a.getCertificateData()
         );
     }
 }

@@ -24,6 +24,13 @@ public class Assignment {
     @Column(nullable = false)
     private AssignmentStatus status = AssignmentStatus.NOT_STARTED;
 
+    @Column(name = "certificate_name", length = 255)
+    private String certificateName;
+
+    @Lob
+    @Column(name = "certificate_data", columnDefinition = "TEXT")
+    private String certificateData;
+
     public Long getId() { return id; }
     public Learner getLearner() { return learner; }
     public void setLearner(Learner learner) { this.learner = learner; }
@@ -31,4 +38,8 @@ public class Assignment {
     public void setActivity(Activity activity) { this.activity = activity; }
     public AssignmentStatus getStatus() { return status; }
     public void setStatus(AssignmentStatus status) { this.status = status; }
+    public String getCertificateName() { return certificateName; }
+    public void setCertificateName(String certificateName) { this.certificateName = certificateName; }
+    public String getCertificateData() { return certificateData; }
+    public void setCertificateData(String certificateData) { this.certificateData = certificateData; }
 }

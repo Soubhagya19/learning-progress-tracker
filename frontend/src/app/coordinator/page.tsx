@@ -477,7 +477,7 @@ export default function CoordinatorDashboard() {
                         {act.title}
                       </div>
                       <div className="text-xs text-slate-400">
-                        {act.topic} Â· <span className="text-emerald-400">{act.plannedHours} hrs</span>
+                        {act.topic} Ã‚Â· <span className="text-emerald-400">{act.plannedHours} hrs</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -587,7 +587,7 @@ export default function CoordinatorDashboard() {
                       >
                         {learners.map((l) => (
                           <option key={l.id} value={l.id} className="bg-[#0b0e20] text-white">
-                            {l.displayName} ({l.cohort} Â· {l.email})
+                            {l.displayName} ({l.cohort} Ã‚Â· {l.email})
                           </option>
                         ))}
                       </select>
@@ -637,7 +637,7 @@ export default function CoordinatorDashboard() {
                               >
                                 <div>
                                   <span className="font-semibold text-white">{asg.activityTitle}</span>
-                                  <span className="ml-2 text-xs text-slate-400">({asg.plannedHours} hrs)</span>
+                                  <span className="ml-2 text-xs text-slate-400">({asg.plannedHours} hrs)</span>{asg.certificateName && asg.certificateData && (<a href={asg.certificateData} download={asg.certificateName} className="ml-2.5 inline-flex items-center rounded-md border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300 hover:bg-emerald-500/25">Cert: {asg.certificateName}</a>)}
                                 </div>
                                 <span
                                   className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${isCompleted

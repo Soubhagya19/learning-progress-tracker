@@ -10,7 +10,9 @@ public class AssignmentDtos {
     ) {}
 
     public record UpdateStatusRequest(
-        @NotBlank(message = "status is required.") String status
+        @NotBlank(message = "status is required.") String status,
+        String certificateName,
+        String certificateData
     ) {}
 
     public record AssignmentResponse(
@@ -20,7 +22,9 @@ public class AssignmentDtos {
         String activityTitle,
         String activityTopic,
         Integer plannedHours,
-        String status
+        String status,
+        String certificateName,
+        String certificateData
     ) {}
 
     public record CohortSummaryResponse(

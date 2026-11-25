@@ -1,11 +1,10 @@
 export type Role = 'COORDINATOR' | 'CANDIDATE';
 
-export interface UserSession {
-  id?: number;
+export interface AuthUser {
+  accountId: number;
   email: string;
-  role: 'COORDINATOR' | 'CANDIDATE';
+  role: Role;
   mustChangePassword: boolean;
-  displayName: string;
 }
 
 export interface Activity {
@@ -20,6 +19,16 @@ export interface Learner {
   displayName: string;
   email: string;
   cohort: string;
+  mustChangePassword: boolean;
+}
+
+export interface CreatedCredentials {
+  learnerId: number;
+  displayName: string;
+  email: string;
+  cohort: string;
+  temporaryPassword: string;
+  expiresAt: string;
 }
 
 export interface Assignment {
@@ -30,19 +39,12 @@ export interface Assignment {
   activityTopic: string;
   plannedHours: number;
   status: 'Not Started' | 'In Progress' | 'Completed';
+  certificateName?: string | null;
+  certificateData?: string | null;
 }
 
 export interface CohortSummary {
   totalLearners: number;
   totalAssignments: number;
   completedAssignments: number;
-}
-
-export interface CreatedCredentials {
-  learnerId: number;
-  displayName: string;
-  email: string;
-  cohort: string;
-  temporaryPassword: string;
-  expiresAt: string;
 }
